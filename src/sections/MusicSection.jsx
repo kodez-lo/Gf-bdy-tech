@@ -1,0 +1,5 @@
+import { siteConfig } from '../config/siteConfig';
+import SectionHeading from '../components/SectionHeading';
+import AudioPlayer from '../components/AudioPlayer';
+
+export default function MusicSection(){const hasMusic=Boolean(siteConfig.audio.audioFile);const hasVoice=Boolean(siteConfig.voiceMessage.audioFile);if(!hasMusic&&!hasVoice)return null;return <section className="section-shell bg-[#100a0e]"><div className="mx-auto max-w-5xl px-5 sm:px-8"><SectionHeading eyebrow="Soundtrack" title="Press play when you want the story to have a soundtrack." copy="Audio never starts automatically. Music and voice notes only play after you choose to start them."/><div className="mt-10 space-y-5">{hasMusic&&<AudioPlayer src={siteConfig.audio.audioFile} title={siteConfig.audio.trackTitle} artist={siteConfig.audio.artistName} cover={siteConfig.audio.coverPhoto}/>} {hasVoice&&<AudioPlayer src={siteConfig.voiceMessage.audioFile} title={siteConfig.voiceMessage.title} cover={siteConfig.voiceMessage.photo} waveform/>}</div></div></section>}
