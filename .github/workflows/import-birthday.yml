@@ -1,0 +1,53 @@
+name: Import birthday website source
+
+on:
+  push:
+    paths:
+      - ".github/workflows/import-birthday.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download and unpack source
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL "https://d2ol7oe51mr4n9.cloudfront.net/user_3IxhxrXoepCB1oWSojcYPdZ5xRy/4b768032-ac35-49cd-8783-801758c64f0c.zip" -o /tmp/birthday-source.zip
+          rm -rf /tmp/birthday-source
+          mkdir -p /tmp/birthday-source
+          unzip -q /tmp/birthday-source.zip -d /tmp/birthday-source
+          SRC="/tmp/birthday-source/premium-birthday-surprise"
+          test -f "$SRC/package.json"
+          rsync -a --delete --exclude ".git/" --exclude ".github/" "$SRC/" ./
+
+      - name: Verify expected project files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f package.json
+          test -f src/App.jsx
+          test -f src/config/siteConfig.js
+          test -f public/images/1000159749.webp
+          echo "Birthday website source imported successfully."
+
+      - name: Commit imported project
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No source changes to commit."
+            exit 0
+          fi
+          git commit -m "Import complete birthday website source"
+          git push
